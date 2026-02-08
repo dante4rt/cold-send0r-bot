@@ -1,7 +1,9 @@
 package sender
 
 import (
+	"crypto/rand"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dantezy/cold-send0r-bot/internal/config"
@@ -39,6 +41,7 @@ func (s *SMTPSender) Send(email *models.Email) error {
 	m.SetAddressHeader("From", s.senderEmail, s.senderName)
 	m.SetHeader("To", email.Contact.Email)
 	m.SetHeader("Subject", email.Subject)
+	m.SetHeader("Message-ID", generateMessageID(s.senderEmail))
 	m.SetBody("text/plain", email.Body)
 
 	for _, attachment := range s.attachments {
@@ -63,4 +66,14 @@ func (s *SMTPSender) Send(email *models.Email) error {
 		Msg("email sent")
 
 	return nil
+}
+
+func generateMessageID(senderEmail string) string {
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	domain := "localhost"
+	if parts := strings.SplitN(senderEmail, "@", 2); len(parts) == 2 {
+		domain = parts[1]
+	}
+	return fmt.Sprintf("<%x.%d@%s>", b, time.Now().UnixNano(), domain)
 }

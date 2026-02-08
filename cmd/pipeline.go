@@ -37,19 +37,29 @@ var pipelineCmd = &cobra.Command{
 		s := scraper.NewScraper(cfg.Scraper)
 		scrapeResults := make(map[string]*models.ScrapeResult)
 
-		log.Info().Int("count", len(contactList)).Msg("scraping company websites")
-		for i, c := range contactList {
-			log.Info().Int("index", i+1).Int("total", len(contactList)).Str("url", c.URL).Msg("scraping")
-			result, err := s.Scrape(c.URL)
+		// Deduplicate URLs before scraping
+		var uniqueURLs []string
+		seen := make(map[string]bool)
+		for _, c := range contactList {
+			if c.URL != "" && !seen[c.URL] {
+				seen[c.URL] = true
+				uniqueURLs = append(uniqueURLs, c.URL)
+			}
+		}
+
+		log.Info().Int("urls", len(uniqueURLs)).Int("contacts", len(contactList)).Msg("scraping company websites")
+		for i, u := range uniqueURLs {
+			log.Info().Int("index", i+1).Int("total", len(uniqueURLs)).Str("url", u).Msg("scraping")
+			result, err := s.Scrape(u)
 			if err != nil {
-				log.Error().Str("url", c.URL).Err(err).Msg("scrape failed")
+				log.Error().Str("url", u).Err(err).Msg("scrape failed")
 				continue
 			}
-			scrapeResults[c.URL] = result
+			scrapeResults[u] = result
 			if result.Error != "" {
-				log.Warn().Str("url", c.URL).Str("error", result.Error).Msg("scrape had issues")
+				log.Warn().Str("url", u).Str("error", result.Error).Msg("scrape had issues")
 			} else {
-				log.Info().Str("url", c.URL).Int("length", len(result.Markdown)).Msg("scraped")
+				log.Info().Str("url", u).Int("length", len(result.Markdown)).Msg("scraped")
 			}
 		}
 

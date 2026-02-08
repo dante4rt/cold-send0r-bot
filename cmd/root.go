@@ -28,8 +28,8 @@ var rootCmd = &cobra.Command{
 		}
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.Kitchen})
 
-		// Skip config loading for init command (config may not exist yet)
-		if cmd.Name() == "init" {
+		// Skip config loading for commands that don't need it
+		if cmd.Name() == "init" || cmd.Name() == "otter" {
 			return nil
 		}
 
