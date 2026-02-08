@@ -13,10 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	otterSupabaseURL = "https://uitzqqugzhhvgvrgxjaw.supabase.co/rest/v1/startups?select=*%2Cstartup_employees%28*%29%2Cstartup_tags%28tag%29&order=created_at.desc"
-	otterAnonKey     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpdHpxcXVnemhodmd2cmd4amF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNjg4MDksImV4cCI6MjA2ODg0NDgwOX0.WVFjmvmLp5uT6MUbNyjW6tjlM1IHMj2T_3d_hZh6v4g"
-)
+const otterSupabaseURL = "https://uitzqqugzhhvgvrgxjaw.supabase.co/rest/v1/startups?select=*%2Cstartup_employees%28*%29%2Cstartup_tags%28tag%29&order=created_at.desc"
 
 type otterStartup struct {
 	Name             string           `json:"name"`
@@ -39,6 +36,7 @@ type otterTag struct {
 var (
 	otterOutput string
 	otterToken  string
+	otterApiKey string
 )
 
 var otterCmd = &cobra.Command{
@@ -53,12 +51,19 @@ var otterCmd = &cobra.Command{
 			return fmt.Errorf("bearer token required: use --token or set OTTER_TOKEN env var\n  (copy from browser DevTools > Network > Authorization header)")
 		}
 
+		if otterApiKey == "" {
+			otterApiKey = os.Getenv("OTTER_API_KEY")
+		}
+		if otterApiKey == "" {
+			return fmt.Errorf("apikey required: use --apikey or set OTTER_API_KEY env var\n  (copy from browser DevTools > Network > apikey header)")
+		}
+
 		client := &http.Client{Timeout: 30 * time.Second}
 		req, err := http.NewRequest(http.MethodGet, otterSupabaseURL, nil)
 		if err != nil {
 			return fmt.Errorf("creating request: %w", err)
 		}
-		req.Header.Set("apikey", otterAnonKey)
+		req.Header.Set("apikey", otterApiKey)
 		req.Header.Set("Authorization", "Bearer "+otterToken)
 		req.Header.Set("Accept-Profile", "public")
 
@@ -124,5 +129,6 @@ var otterCmd = &cobra.Command{
 func init() {
 	otterCmd.Flags().StringVarP(&otterOutput, "output", "o", "contacts.json", "output file path")
 	otterCmd.Flags().StringVar(&otterToken, "token", "", "otter bearer token (or set OTTER_TOKEN env)")
+	otterCmd.Flags().StringVar(&otterApiKey, "apikey", "", "otter supabase apikey (or set OTTER_API_KEY env)")
 	rootCmd.AddCommand(otterCmd)
 }
