@@ -1,10 +1,10 @@
 [
   {
-    "email": "alice@holdex.io",
+    "email": "alice@google.com",
     "name": "Alice Chen",
-    "company": "Holdex",
+    "company": "Google",
     "role": "CTO",
-    "url": "https://holdex.io"
+    "url": "https://google.com"
   },
   {
     "email": "bob@alchemy.com",
