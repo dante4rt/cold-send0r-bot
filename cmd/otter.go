@@ -16,11 +16,11 @@ import (
 const otterSupabaseURL = "https://uitzqqugzhhvgvrgxjaw.supabase.co/rest/v1/startups?select=*%2Cstartup_employees%28*%29%2Cstartup_tags%28tag%29&order=created_at.desc"
 
 type otterStartup struct {
-	Name             string           `json:"name"`
-	Website          *string          `json:"website"`
-	Sector           string           `json:"sector"`
-	StartupEmployees []otterEmployee  `json:"startup_employees"`
-	StartupTags      []otterTag       `json:"startup_tags"`
+	Name             string          `json:"name"`
+	Website          *string         `json:"website"`
+	Sector           string          `json:"sector"`
+	StartupEmployees []otterEmployee `json:"startup_employees"`
+	StartupTags      []otterTag      `json:"startup_tags"`
 }
 
 type otterEmployee struct {
@@ -35,7 +35,6 @@ type otterTag struct {
 
 var (
 	otterOutput string
-	otterToken  string
 	otterApiKey string
 )
 
@@ -44,13 +43,6 @@ var otterCmd = &cobra.Command{
 	Short: "Import contacts from useotter.app",
 	Long:  "Fetches startup data from Otter and converts to contacts.json format.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if otterToken == "" {
-			otterToken = os.Getenv("OTTER_TOKEN")
-		}
-		if otterToken == "" {
-			return fmt.Errorf("bearer token required: use --token or set OTTER_TOKEN env var\n  (copy from browser DevTools > Network > Authorization header)")
-		}
-
 		if otterApiKey == "" {
 			otterApiKey = os.Getenv("OTTER_API_KEY")
 		}
@@ -64,7 +56,7 @@ var otterCmd = &cobra.Command{
 			return fmt.Errorf("creating request: %w", err)
 		}
 		req.Header.Set("apikey", otterApiKey)
-		req.Header.Set("Authorization", "Bearer "+otterToken)
+		req.Header.Set("Authorization", "Bearer "+otterApiKey)
 		req.Header.Set("Accept-Profile", "public")
 
 		log.Info().Msg("fetching startups from otter")
@@ -128,7 +120,6 @@ var otterCmd = &cobra.Command{
 
 func init() {
 	otterCmd.Flags().StringVarP(&otterOutput, "output", "o", "contacts.json", "output file path")
-	otterCmd.Flags().StringVar(&otterToken, "token", "", "otter bearer token (or set OTTER_TOKEN env)")
 	otterCmd.Flags().StringVar(&otterApiKey, "apikey", "", "otter supabase apikey (or set OTTER_API_KEY env)")
 	rootCmd.AddCommand(otterCmd)
 }
