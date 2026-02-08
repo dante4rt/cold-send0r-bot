@@ -11,7 +11,7 @@ contacts.json
 attachments/
 
 # Output
-output/
+/output/
 
 # Binaries
 *.exe
