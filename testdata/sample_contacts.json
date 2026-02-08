@@ -1,0 +1,16 @@
+[
+  {
+    "email": "alice@holdex.io",
+    "name": "Alice Chen",
+    "company": "Holdex",
+    "role": "CTO",
+    "url": "https://holdex.io"
+  },
+  {
+    "email": "bob@alchemy.com",
+    "name": "Bob Smith",
+    "company": "Alchemy",
+    "role": "Engineering Lead",
+    "url": "https://alchemy.com"
+  }
+]

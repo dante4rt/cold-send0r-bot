@@ -1,0 +1,40 @@
+sender:
+  name: "Your Full Name"
+  email: "you@example.com"
+  links:
+    GitHub: "https://github.com/yourusername"
+    Portfolio: "https://yourportfolio.com"
+    LinkedIn: "https://linkedin.com/in/yourprofile"
+
+resume:
+  text_path: "./resume.txt"
+  attachments:
+    - "./attachments/Your Resume.pdf"
+
+contacts:
+  path: "./contacts.json"
+
+scraper:
+  provider: "colly"
+  rate_limit_ms: 2000
+  timeout_ms: 30000
+  max_content_length: 3000
+  rod_fallback: true
+
+llm:
+  provider: "openrouter"
+  api_key_env: "OPENROUTER_API_KEY"
+  model: "google/gemini-2.5-flash"
+  temperature: 0.7
+  max_tokens: 500
+  rate_limit_ms: 1000
+
+smtp:
+  host: "smtp.gmail.com"
+  port: 587
+  username_env: "SMTP_USERNAME"
+  password_env: "SMTP_PASSWORD"
+  rate_limit_ms: 5000
+
+output:
+  path: "output/emails.json"

@@ -1,0 +1,32 @@
+# Claude files
+.claude/
+
+# Environment
+.env
+
+# User config (use *.example.* as templates)
+config.yaml
+resume.txt
+contacts.json
+attachments/
+
+# Output
+output/
+
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+send0r
+
+# Test
+*.test
+*.out
+
+# OS
+.DS_Store
+
+# Vendor
+vendor/
