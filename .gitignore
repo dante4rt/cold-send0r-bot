@@ -8,10 +8,12 @@
 config.yaml
 resume.txt
 contacts.json
-attachments/
+attachments/*
+!attachments/.gitkeep
 
 # Output
-/output/
+/output/*
+!/output/.gitkeep
 
 # Binaries
 *.exe
