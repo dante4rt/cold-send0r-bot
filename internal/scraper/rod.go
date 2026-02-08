@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"fmt"
+	"os/user"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -19,9 +20,23 @@ func (s *CollyRodScraper) scrapeWithRod(url string) (string, error) {
 
 	timeout := time.Duration(s.cfg.TimeoutMs) * time.Millisecond
 
-	u := launcher.New().Bin(path).Headless(true).MustLaunch()
-	browser := rod.New().ControlURL(u).Timeout(timeout).MustConnect()
-	defer browser.MustClose()
+	l := launcher.New().Bin(path).Headless(true)
+
+	// Chrome requires --no-sandbox when running as root (common on Linux servers)
+	if u, err := user.Current(); err == nil && u.Uid == "0" {
+		l = l.NoSandbox(true)
+	}
+
+	u, err := l.Launch()
+	if err != nil {
+		return "", fmt.Errorf("launching browser: %w", err)
+	}
+
+	browser := rod.New().ControlURL(u).Timeout(timeout)
+	if err := browser.Connect(); err != nil {
+		return "", fmt.Errorf("connecting to browser: %w", err)
+	}
+	defer browser.Close()
 
 	page, err := browser.Page(proto.TargetCreateTarget{URL: url})
 	if err != nil {
