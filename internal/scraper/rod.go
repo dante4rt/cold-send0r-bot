@@ -16,17 +16,19 @@ func (s *CollyRodScraper) scrapeWithRod(url string) (string, error) {
 		return "", fmt.Errorf("chrome not found at any standard path")
 	}
 
+	timeout := time.Duration(s.cfg.TimeoutMs) * time.Millisecond
+
 	u := launcher.New().Bin(path).Headless(true).MustLaunch()
-	browser := rod.New().ControlURL(u).MustConnect()
+	browser := rod.New().ControlURL(u).Timeout(timeout).MustConnect()
 	defer browser.MustClose()
 
 	page := browser.MustPage(url)
-	err := page.WaitStable(time.Duration(s.cfg.TimeoutMs/3) * time.Millisecond)
+	err := page.Timeout(timeout / 3).WaitStable(timeout / 3)
 	if err != nil {
 		log.Warn().Str("url", url).Err(err).Msg("page did not stabilize, proceeding anyway")
 	}
 
-	html, err := page.HTML()
+	html, err := page.Timeout(timeout).HTML()
 	if err != nil {
 		return "", fmt.Errorf("getting page HTML: %w", err)
 	}
