@@ -24,7 +24,7 @@ scraper:
 llm:
   provider: "openrouter"
   api_key_env: "OPENROUTER_API_KEY"
-  model: "openrouter/pony-alpha"
+  model: "google/gemini-2.5-flash"
   temperature: 0.7
   max_tokens: 500
   rate_limit_ms: 1000
